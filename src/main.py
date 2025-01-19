@@ -1,4 +1,4 @@
-#change all the names of variable
+#testing
 import pygame
 import copy
 import random
@@ -63,7 +63,7 @@ class slot:
     def ifclicked(self,x,y):
         xstuff = x-self.posx
         ystuff = y-self.posy
-        if self.plant.cost < self.board.give_sun():
+        if self.plant.cost <= self.board.give_sun():
             return xstuff <80 and xstuff >0 and ystuff <90 and ystuff >0
     def display1(self,x,y):
         slotimgs = self.plant.giveimg()
