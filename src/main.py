@@ -1,9 +1,9 @@
-#testing
 import pygame
 import copy
 import random
 import math
 import mapgen
+from enemy import basic,speed,tank
 class plot:
     def __init__(self, x, y,texture,defaultplant,board):
         self.positionx = (x)
@@ -84,6 +84,8 @@ class board:
         self.enemy_list = []
         self.projectile_list =[]
         self.default_plant=default
+    def give_plots(self):
+        return self.plots
     def add_entity(self,entity):
         self.entity_to_display.append(entity)
     def give_entity(self):
@@ -243,7 +245,7 @@ class projectile:
         self.board = board
     def updatetarget(self):
         self.targetxy = self.target.xypos()
-        if self.target.hp == 0:
+        if self.target.hp <= 0:
             self.hp = 0
     def action(self):
         self.updatetarget()
@@ -352,97 +354,7 @@ class projectile_poison(projectile):
                 self.location[0] += round(xmove)
                 self.location[1]+= round(ymove)
                 self.display()
-class enemy:
-    def __init__(self,start,board):
-        self.hp = 0
-        self.speed = 0
-        self.img = 0
-        self.current_direction = 0
-        self.pos = start
-        self.distance_till_next = 0
-        self.board = board
-        self.debuff = []
-    def add_debuff(self,debuff):
-        for i in self.debuff:
-            if i.name == debuff.name:
-                i.reset()
-                return i
-        self.debuff.append(debuff)
-    def update_debuff(self):
-        for i in self.debuff:
-            if not i.tick():
-                i.effectgone()
-                self.debuff.remove(i)
-    def check_direction(self):
-        for i in game.plots:
-            if i.givexy() == self.pos:
-                self.current_direction = i.givetype()
-                if i.givetype() == "end":
-                    self.board.loosehp()
-                    print ("lost hp")
-                    self.hp = 0
-    def action(self):
-        if self.distance_till_next>0:
-            self.move()
-        else:
-            if self.current_direction == 4:
-                self.pos[1] += 1
-            if self.current_direction == 3:
-                self.pos[0] = self.pos[0] - 1
-            if self.current_direction == 2:
-                self.pos[1] = self.pos[1] -1
-            if self.current_direction == 1:
-                self.pos[0] += 1
-            self.check_direction()
-            self.distance_till_next = 60
-        self.display()
-    def move(self):
-        self.update_debuff()
-        self.distance_till_next = self.distance_till_next-self.speed
-    def xypos(self):
-        x = self.pos[0]*60+130
-        y = self.pos[1]*60+110
-        distance_moved = 60-self.distance_till_next
-        if self.current_direction == 4:
-            y += distance_moved
-        if self.current_direction == 3:
-            x = x - distance_moved
-        if self.current_direction == 2:
-            y = y -distance_moved
-        if self.current_direction == 1:
-            x += distance_moved
-        return [x,y]
-    def display(self):
-        xycord = self.xypos()
-        enemyimg =self.img
-        DEFAULT_IMAGE_SIZE = (40, 40)
-        enemyimg = pygame.transform.scale(enemyimg, DEFAULT_IMAGE_SIZE)
-        self.board.give_screen().blit(enemyimg,xycord)
-    def loosehp(self,dmg):
-        self.hp = self.hp-dmg
-    def speedmodi(self,modi):
-        self.speed = self.speed*modi
 
-        
-
-class basic(enemy):
-    def __init__(self,start,board):
-        super().__init__(start,board)
-        self.hp = 100
-        self.speed = 1
-        self.img = pygame.image.load("resource/henrymak.jpg")
-class tank(enemy):
-    def __init__(self,start,board):
-        super().__init__(start,board)
-        self.hp = 400
-        self.speed = 0.5
-        self.img = pygame.image.load("resource/tank.png")
-class speed(enemy):
-    def __init__(self,start,board):
-        super().__init__(start,board)
-        self.hp = 60
-        self.speed = 2
-        self.img = pygame.image.load("resource/speed.png")
 
 class Debuff:
     def __init__(self,duration,target):
@@ -457,6 +369,7 @@ class Debuff:
         return self.name
     def reset(self):
         self.remaining_duration = self.duration
+
 class PoisonDebuff(Debuff):
     def __init__(self,duration,target):
         self.name = "P"
@@ -465,6 +378,7 @@ class PoisonDebuff(Debuff):
         self.target.loosehp(0.1)
     def effectgone(self):
         pass
+
 class SlowDebuff(Debuff):
     def __init__(self,duration,target):
         self.name = "S"
@@ -476,10 +390,12 @@ class SlowDebuff(Debuff):
             self.target.speedmodi(0.5)
     def effectgone(self):
         self.target.speedmodi(2)
+
 def plantings(x,y,plant,price):
     for i in game.plots:
         if i.checkclick(x,y) and i.planted():
             i.planting(plant,price)
+
 #preset= "114441144411122222322111444411111"
 def clickeditem(x,y):
     for i in game.give_entity():
@@ -501,20 +417,21 @@ def spawnsmth(entryspot,enemyspawntime,time):
         else:
             enemyspawntime -= 1
     else:
-            if enemyspawntime <=0:
-                a = random.randint(1,3)
-                if a == 1:
-                    temp = basic(entryspot,game)
-                elif a ==2:
-                    temp = speed(entryspot,game)
-                else:
-                    temp = tank(entryspot,game)
-                game.add_enemy(temp)
-                game.enemy_list[-1].check_direction()
-                enemyspawntime = random.randint(500,1000)
+        if enemyspawntime <=0:
+            a = random.randint(1,3)
+            if a == 1:
+                temp = basic(entryspot,game)
+            elif a ==2:
+                temp = speed(entryspot,game)
             else:
-                enemyspawntime -= 2
+                temp = tank(entryspot,game)
+            game.add_enemy(temp)
+            game.enemy_list[-1].check_direction()
+            enemyspawntime = random.randint(500,1000)
+        else:
+            enemyspawntime -= 2
     return enemyspawntime
+
 def remove_death(thelist):
     deadlist = []
     count = 0
@@ -526,11 +443,13 @@ def remove_death(thelist):
         thelist.pop(deadlist[-1])
         deadlist.pop(-1)
     return thelist
+
 pygame.init()
 screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
 defaultplant = plant("nothing")
 game = board(screen,defaultplant)
+
 def main():
     running = True
     dt = 0
@@ -541,6 +460,7 @@ def main():
     game.createboard()
     path_image = pygame.image.load("resource/path.png")
     path_image = pygame.transform.scale(path_image, (60,60))
+
     for i in range(len(preset)):
         game.changegrid(current[0],current[1],int(preset[i]),path_image)
         if preset[i] == "1":
@@ -551,26 +471,28 @@ def main():
             current[0] -= 1
         if preset[i] == "4":
             current[1] += 1
+
     end_image = pygame.image.load("resource/end.png")
     end_image = pygame.transform.scale(end_image, (60,60))
+
     game.changegrid(current[0],current[1],"end",end_image)
-    #create a slot here in 3-5business days
     holdingitem = False
     sunflowerslot= slot(sunflower(game),120,1,game)
     shooterslot = slot(shooter(game),200,1,game)
+
     game.add_entity(sunflowerslot)
     game.add_entity(shooterslot)
     slowerslot = slot(slower(game),280,1,game)
     game.add_entity(slowerslot)
     poisonslot = slot(poisoner(game),360,1,game)
     game.add_entity(poisonslot)
+
     enemyspawntime = 500
     font = pygame.font.Font(None, 74)
     white = (255, 255, 255)
     time = 0
     while running:
         for event in pygame.event.get():
-            
             if event.type == pygame.QUIT:
                 running = False
                     
@@ -612,5 +534,12 @@ def main():
         sunlight_rect = display_sunlight.get_rect(center=(200, 150))
         screen.blit(display_sunlight,sunlight_rect)
         pygame.display.flip()
+
     pygame.quit()
-main()
+
+
+if __name__ == '__main__':
+    '''
+    Functionality: 
+    '''
+    main()

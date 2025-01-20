@@ -1,4 +1,5 @@
 import random
+
 class grid():
     def __init__(self,h,l):
         self.boxes = []
