@@ -178,14 +178,15 @@ class shooter(plant):
         self.dmg = 10
     def search(self,enemy):
         in_range = []
+        #merge sort
+        closest = False
         for i in enemy:
             temp = i.xypos()
             x = temp[0]
             y = temp[1]
             if x> self.positionx -300 and x < self.positionx+300 and y> self.positiony -300 and y< self.positiony + 300:
                 in_range.append(i)
-        distance = 99999999999
-        closest = False
+        distance = []
         for i in in_range:
             temp = i.xypos()
             x = temp[0]
@@ -194,10 +195,22 @@ class shooter(plant):
                 x = int(x+0.5)
             if isinstance(y,float):
                 y = int(y+0.5)
-            d = float((self.positionx-x)^2) + float((self.positiony-y)^2)
-            if d<float(distance):
-                distance= d
-                closest= i
+            d = float((self.positionx-x)**2) + float((self.positiony-y)**2)
+            distance.append(d)
+        if len(distance) > 0:
+            mergeSort(distance)
+            closest = distance[0]
+            for i in in_range:
+                temp = i.xypos()
+                x = temp[0]
+                y = temp[1]
+                if isinstance(x,float):
+                    x = int(x+0.5)
+                if isinstance(y,float):
+                    y = int(y+0.5)
+                d = float((self.positionx-x)**2) + float((self.positiony-y)**2)
+                if d == closest:
+                    closest = i
         return closest
     def action(self):
         enemy_list = self.board.give_enemy()
@@ -396,12 +409,38 @@ def plantings(x,y,plant,price):
         if i.checkclick(x,y) and i.planted():
             i.planting(plant,price)
 
-#preset= "114441144411122222322111444411111"
 def clickeditem(x,y):
     for i in game.give_entity():
         if i.ifclicked(x,y):
             return i
     return False
+def mergeSort(nums):
+    if len(nums) < 2:
+        return nums
+    mid = len(nums) // 2
+    left = mergeSort(nums[:mid])
+    right = mergeSort(nums[mid:])
+
+    i = j = 0
+    result = []
+    while i < len(left) and j < len(right):
+        if left[i] < right[j]: 
+            result.append(left[i])
+            i += 1
+        else: 
+            result.append(right[j])
+            j += 1
+
+    while i < len(left): 
+        result.append(left[i]) 
+        i += 1
+
+    while j < len(right): 
+        result.append(right[j]) 
+        j += 1
+
+    return result
+
 def actions(object):
     object.timeuntilaction -= 0.1
     if object.timeuntilaction <= 0:
