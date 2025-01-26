@@ -1,9 +1,11 @@
+#todo readme graphic, python doc,comment class, change enemy.update_direction so it doesnt search everything, python enum
 import pygame
 import copy
 import random
 import math
+import enemy
 import mapgen
-from enemy import basic,speed,tank
+from enemy import Basic,Speed,Tank
 class plot:
     def __init__(self, x, y,texture,defaultplant,board):
         self.positionx = (x)
@@ -84,6 +86,8 @@ class board:
         self.enemy_list = []
         self.projectile_list =[]
         self.default_plant=default
+    def give_playerhealth(self):
+        return self.playerhealth
     def give_plots(self):
         return self.plots
     def add_entity(self,entity):
@@ -450,8 +454,8 @@ enemyspawntime = 500
 def spawnsmth(entryspot,enemyspawntime,time):
     if time < 4000:
         if enemyspawntime <=0:
-            game.add_enemy(basic(entryspot,game))
-            game.enemy_list[-1].check_direction()
+            game.add_enemy(Basic(entryspot,game))
+            game.enemy_list[-1].update_direction()
             enemyspawntime = random.randint(500,1000)
         else:
             enemyspawntime -= 1
@@ -459,13 +463,13 @@ def spawnsmth(entryspot,enemyspawntime,time):
         if enemyspawntime <=0:
             a = random.randint(1,3)
             if a == 1:
-                temp = basic(entryspot,game)
+                temp = Basic(entryspot,game)
             elif a ==2:
-                temp = speed(entryspot,game)
+                temp = Speed(entryspot,game)
             else:
-                temp = tank(entryspot,game)
+                temp = Tank(entryspot,game)
             game.add_enemy(temp)
-            game.enemy_list[-1].check_direction()
+            game.enemy_list[-1].update_direction()
             enemyspawntime = random.randint(500,1000)
         else:
             enemyspawntime -= 2
@@ -535,7 +539,9 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
                     
-                
+        if game.give_playerhealth() == 0:
+            running = False
+            print ("FAIL")
         slotimg = pygame.image.load("resource/9_Seed_Slots.webp")
         slot_size = (900,100)
         slotimg = pygame.transform.scale(slotimg,slot_size)

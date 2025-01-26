@@ -1,7 +1,11 @@
 import pygame
-class enemy:
+DEFAULT_IMAGE_SIZE = (40, 40)
+class Enemy:
+    '''
+    
+    '''
     def __init__(self,start,board):
-        self.hp = 0
+        self.Health_point = 0
         self.speed = 0
         self.img = 0
         self.current_direction = 0
@@ -15,19 +19,19 @@ class enemy:
                 i.reset()
                 return i
         self.debuff.append(debuff)
-    def update_debuff(self):
+    def update_debuff_status(self):
         for i in self.debuff:
             if not i.tick():
                 i.effectgone()
                 self.debuff.remove(i)
-    def check_direction(self):
+    def update_direction(self):
         for i in self.board.give_plots():
             if i.givexy() == self.pos:
                 self.current_direction = i.givetype()
                 if i.givetype() == "end":
                     self.board.loosehp()
                     print ("lost hp")
-                    self.hp = 0
+                    self.Health_point = 0
     def action(self):
         if self.distance_till_next>0:
             self.move()
@@ -40,11 +44,11 @@ class enemy:
                 self.pos[1] = self.pos[1] -1
             if self.current_direction == 1:
                 self.pos[0] += 1
-            self.check_direction()
+            self.update_direction()
             self.distance_till_next = 60
         self.display()
     def move(self):
-        self.update_debuff()
+        self.update_debuff_status()
         self.distance_till_next = self.distance_till_next-self.speed
     def xypos(self):
         x = self.pos[0]*60+130
@@ -60,31 +64,30 @@ class enemy:
             x += distance_moved
         return [x,y]
     def display(self):
-        xycord = self.xypos()
+        xycoord = self.xypos()
         enemyimg =self.img
-        DEFAULT_IMAGE_SIZE = (40, 40)
         enemyimg = pygame.transform.scale(enemyimg, DEFAULT_IMAGE_SIZE)
-        self.board.give_screen().blit(enemyimg,xycord)
+        self.board.give_screen().blit(enemyimg,xycoord)
     def loosehp(self,dmg):
-        self.hp = self.hp-dmg
+        self.Health_point = self.Health_point-dmg
     def speedmodi(self,modi):
         self.speed = self.speed*modi
 
         
 
-class basic(enemy):
+class Basic(Enemy):
     def __init__(self,start,board):
         super().__init__(start,board)
         self.hp = 100
         self.speed = 1
         self.img = pygame.image.load("resource/henrymak.jpg")
-class tank(enemy):
+class Tank(Enemy):
     def __init__(self,start,board):
         super().__init__(start,board)
         self.hp = 400
         self.speed = 0.5
         self.img = pygame.image.load("resource/tank.png")
-class speed(enemy):
+class Speed(Enemy):
     def __init__(self,start,board):
         super().__init__(start,board)
         self.hp = 60
