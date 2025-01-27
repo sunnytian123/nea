@@ -1,12 +1,9 @@
 import pygame
 DEFAULT_IMAGE_SIZE = (40, 40)
 class Enemy:
-    '''
-    
-    '''
     def __init__(self,start,board):
-        self.Health_point = 0
-        self.speed = 0
+        self.hp = 100
+        self.speed = 1
         self.img = 0
         self.current_direction = 0
         self.pos = start
@@ -31,7 +28,7 @@ class Enemy:
                 if i.givetype() == "end":
                     self.board.loosehp()
                     print ("lost hp")
-                    self.Health_point = 0
+                    self.hp = 0
     def action(self):
         if self.distance_till_next>0:
             self.move()
@@ -69,29 +66,28 @@ class Enemy:
         enemyimg = pygame.transform.scale(enemyimg, DEFAULT_IMAGE_SIZE)
         self.board.give_screen().blit(enemyimg,xycoord)
     def loosehp(self,dmg):
-        self.Health_point = self.Health_point-dmg
-    def speedmodi(self,modi):
+        self.hp = self.hp-dmg
+    def speed_modi(self,modi):
         self.speed = self.speed*modi
-
-        
 
 class Basic(Enemy):
     def __init__(self,start,board):
         super().__init__(start,board)
         self.hp = 100
         self.speed = 1
-        self.img = pygame.image.load("resource/henrymak.jpg")
+        self.img = pygame.image.load("./resource/henrymak.jpg")
+
 class Tank(Enemy):
     def __init__(self,start,board):
         super().__init__(start,board)
         self.hp = 400
         self.speed = 0.5
-        self.img = pygame.image.load("resource/tank.png")
+        self.img = pygame.image.load("./resource/tank.png")
 class Speed(Enemy):
     def __init__(self,start,board):
         super().__init__(start,board)
         self.hp = 60
         self.speed = 2
-        self.img = pygame.image.load("resource/speed.png")
+        self.img = pygame.image.load("./resource/speed.png")
 
 

@@ -1,11 +1,12 @@
 #todo readme graphic, python doc,comment class, change enemy.update_direction so it doesnt search everything, python enum
+#more enemy class, make maze gen 1d
 import pygame
 import copy
 import random
 import math
-import enemy
 import mapgen
 from enemy import Basic,Speed,Tank
+DEFAULT_IMAGE_SIZE = (40, 40)
 class plot:
     def __init__(self, x, y,texture,defaultplant,board):
         self.positionx = (x)
@@ -97,7 +98,7 @@ class board:
     def return_default(self):
         return self.default_plant
     def createboard(self):
-        tile_image = pygame.image.load("resource/tiles.png")
+        tile_image = pygame.image.load("./resource/tiles.png")
         tile_image = pygame.transform.scale(tile_image,(60,60))
         for i in range(15):
             for a in range(9):
@@ -164,7 +165,7 @@ class plant:
 class sunflower(plant):
     def __init__(self,board):
         super().__init__(board)
-        self.img = pygame.image.load("resource/sunflower.png")
+        self.img = pygame.image.load("./resource/sunflower.png")
         self.cost = 100
         self.hp = 100
         self.time = 50
@@ -174,7 +175,7 @@ class sunflower(plant):
 class shooter(plant):
     def __init__(self,board):
         super().__init__(board)
-        self.img = pygame.image.load("resource/bow.png")
+        self.img = pygame.image.load("./resource/bow.png")
         self.cost = 100
         self.hp = 100
         self.time = 20
@@ -225,7 +226,7 @@ class shooter(plant):
 class slower(shooter):
     def __init__(self,board):
         super().__init__(board)
-        self.img = pygame.image.load("resource/slow.png")
+        self.img = pygame.image.load("./resource/slow.png")
         self.cost = 75
         self.hp = 100
         self.time = 40
@@ -239,7 +240,7 @@ class slower(shooter):
 class poisoner(shooter):
     def __init__(self,board):
         super().__init__(board)
-        self.img = pygame.image.load("resource/poison.png")
+        self.img = pygame.image.load("./resource/poison.png")
         self.cost = 175
         self.hp = 100
         self.time = 40
@@ -258,7 +259,7 @@ class projectile:
         self.targetxy = target.xypos()
         self.location = location
         self.hp = 1
-        self.img = pygame.image.load("resource/projectile.png")
+        self.img = pygame.image.load("./resource/projectile.png")
         self.board = board
     def updatetarget(self):
         self.targetxy = self.target.xypos()
@@ -309,7 +310,7 @@ class projectile:
 class projectile_slow(projectile):
     def __init__(self, dmg, target, location, board):
         super().__init__(dmg, target, location, board)
-        self.img = pygame.image.load("resource/slow_project.png")
+        self.img = pygame.image.load("./resource/slow_project.png")
     def action(self):
             self.updatetarget()
             enemy_list = self.board.give_enemy()
@@ -342,7 +343,7 @@ class projectile_slow(projectile):
 class projectile_poison(projectile):
     def __init__(self, dmg, target, location, board):
         super().__init__(dmg, target, location, board)
-        self.img = pygame.image.load("resource/poison_proj.png")
+        self.img = pygame.image.load("./resource/poison_proj.png")
     def action(self):
             self.updatetarget()
             enemy_list = self.board.give_enemy()
@@ -404,9 +405,9 @@ class SlowDebuff(Debuff):
     def effect(self):
         if self.applied == False:
             self.applied = True
-            self.target.speedmodi(0.5)
+            self.target.speed_modi(0.5)
     def effectgone(self):
-        self.target.speedmodi(2)
+        self.target.speed_modi(2)
 
 def plantings(x,y,plant,price):
     for i in game.plots:
@@ -501,7 +502,7 @@ def main():
     print (entry)
     current = copy.copy(entry)
     game.createboard()
-    path_image = pygame.image.load("resource/path.png")
+    path_image = pygame.image.load("./resource/path.png")
     path_image = pygame.transform.scale(path_image, (60,60))
 
     for i in range(len(preset)):
@@ -515,7 +516,7 @@ def main():
         if preset[i] == "4":
             current[1] += 1
 
-    end_image = pygame.image.load("resource/end.png")
+    end_image = pygame.image.load("./resource/end.png")
     end_image = pygame.transform.scale(end_image, (60,60))
 
     game.changegrid(current[0],current[1],"end",end_image)
@@ -542,10 +543,10 @@ def main():
         if game.give_playerhealth() == 0:
             running = False
             print ("FAIL")
-        slotimg = pygame.image.load("resource/9_Seed_Slots.webp")
+        slotimg = pygame.image.load("./resource/9_Seed_Slots.webp")
         slot_size = (900,100)
         slotimg = pygame.transform.scale(slotimg,slot_size)
-        img = pygame.image.load("resource/download.jpg")
+        img = pygame.image.load("./resource/download.jpg")
         DEFAULT_IMAGE_SIZE = (1280, 720)
         img = pygame.transform.scale(img, DEFAULT_IMAGE_SIZE)
         screen.blit(img,(0,0))
