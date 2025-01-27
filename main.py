@@ -4,8 +4,8 @@ import pygame
 import copy
 import random
 import math
-import mapgen
-from enemy import Basic,Speed,Tank
+import src.mapgen
+from src.enemy import Basic,Speed,Tank
 DEFAULT_IMAGE_SIZE = (40, 40)
 class plot:
     def __init__(self, x, y,texture,defaultplant,board):
@@ -497,8 +497,8 @@ game = board(screen,defaultplant)
 def main():
     running = True
     dt = 0
-    preset= mapgen.preset
-    entry = mapgen.start
+    preset= src.mapgen.preset
+    entry = src.mapgen.start
     print (entry)
     current = copy.copy(entry)
     game.createboard()
