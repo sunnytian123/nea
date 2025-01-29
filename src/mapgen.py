@@ -65,7 +65,6 @@ class grid():
         return x+y*self.l
     def makemaze(self):
         self.start = [0,random.randint(0,self.h-1)]
-        self.current = self.start
         self.choosenext(self.boxes[self.boxnum(self.start[0],self.start[1])])
     def choosenext(self,box):
         box.visit()
